@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog as fd
-import rle
+from information import *
 import os
 
 pack_path = ""
@@ -26,13 +26,9 @@ def pack():
     print("." + pack_input.get() + ".")
     if pack_input.get() == "":
         result_label = tk.Label(text="Error: enter the output file name", fg="red")
-    else:
-        with open(pack_path, 'r') as file:
-            text = file.read()
-            with open(pack_input.get() + ".seven", 'w') as output:
-                packed = rle.pack(text)
-                output.write(packed)
-                result_label = tk.Label(text="Success", fg="green")
+
+    info = Information()
+
     result_label.pack()
 
 
@@ -166,3 +162,5 @@ render_left()
 render_right()
 
 tk.mainloop()
+
+# f.write(struct.pack('<2sihhi', bytes.fromhex("424D"), file_size, 0, 0, 54))
