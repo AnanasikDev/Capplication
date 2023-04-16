@@ -2,9 +2,11 @@ import struct
 from rle import *
 
 class Information:
+    # little-endian
+
     BYTE = 0
     TEXT = 1
-    signature = "B2E6C8DD"
+    signature = "CAFEFADE"
     signature_size = 4
     def __init__(self, algorithm):
         self.sequence = None
@@ -17,7 +19,7 @@ class Information:
                 sequence = []
                 while True:
                     try:
-                        sequence.append(hex(struct.unpack("<1", file.read(1))[0]))
+                        sequence.append(hex(struct.unpack("<B", file.read(1))[0])[2::].upper().zfill(2))
                     except:
                         break
         self.sequence = sequence
@@ -31,9 +33,10 @@ class Information:
         file_size = len(packed) + Information.signature_size + 4
 
         with open(path, "wb") as file:
-            file.write(struct.pack('<4i', bytes.fromhex(Information.signature), file_size))
-            for element in packed:
-                file.write(struct.pack('<b', element))
+            file.write(struct.pack('<4si', bytes.fromhex(Information.signature), file_size))
+            for byte in packed:
+                print(byte)
+                file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
 
     def __unpack_byte(self, path):
@@ -62,7 +65,7 @@ class Information:
 
             pass
 
-
 i = Information(Information.BYTE)
-i.read_sequence("byte_test.b")
-print(i.sequence)
+i.read_sequence("img")
+i.pack()
+# print(i.sequence)
