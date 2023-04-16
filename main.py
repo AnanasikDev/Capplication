@@ -54,7 +54,7 @@ def unpack():
     result_label.pack()
 
 
-def memorize_file2pack():
+def callback_pack():
     global pack_path, pack_label_inputname, pack_label_filesize
     pack_path = fd.askopenfilename()
     print(pack_path)
@@ -78,7 +78,7 @@ def memorize_file2pack():
     pack_label_filesize.place(x=10, y=100)
 
 
-def memorize_file2unpack():
+def callback_unpack():
     global unpack_path, unpack_label_inputname, unpack_label_filesize
     unpack_path = fd.askopenfilename()
     print(unpack_path)
@@ -103,7 +103,7 @@ def memorize_file2unpack():
 
 
 window = tk.Tk()
-window.title("File pack")
+window.title("SEVEN File pack")
 center_x = 1920//2
 center_y = 1080//2
 
@@ -120,7 +120,7 @@ def render_left():
     left.pack()
     left.place(x=0, y=0)
 
-    btn_pack = tk.Button(left, text='Search file to pack...', command=memorize_file2pack)
+    btn_pack = tk.Button(left, text='Search file to pack...', command=callback_pack)
     btn_pack.pack(side=tk.LEFT)
     btn_pack.place(x=0, y=0, width=500)
 
@@ -145,7 +145,7 @@ def render_right():
     right.pack()
     right.place(x=500, y=0)
 
-    btn_pack = tk.Button(right, text='Search file to unpack...', command=memorize_file2unpack)
+    btn_pack = tk.Button(right, text='Search file to unpack...', command=callback_unpack)
     btn_pack.pack(side=tk.LEFT)
     btn_pack.place(x=0, y=0, width=500)
 
