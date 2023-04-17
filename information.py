@@ -7,6 +7,7 @@ class Information:
     BYTE = 0
     TEXT = 1
     signature = "CAFEFADE"
+    signature_bs = ["CA", "FE", "FA", "DE"]
     signature_size = 4
     def __init__(self, algorithm):
         self.sequence = None
@@ -41,31 +42,25 @@ class Information:
 
     def __unpack_byte(self, path):
 
-        with open(path, "rb") as file:
-            signature = file.read(4)
-            if signature != bytes.fromhex(Information.signature):
-                print("Format error")
-                return False
+        unpacked = RLE(self.sequence).unpack_byte(Information.signature_bs)
 
-            file_size = int(hex(struct.unpack("<i", file.read(4))[0]), 16)
-            print("file size =", file_size)
-
-            parsed = []
-
-            for i in range(file_size - 8):
-                parsed.append(hex(struct.unpack("<b", file.read(1))[0]))
+        with open(path, "wb") as file:
+            for byte in unpacked:
+                # print(byte)
+                file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
 
-        unpacked = RLE(parsed).unpack_byte()
-
-
-    def pack(self):
+    def pack(self, input_file, output_file):
         if self.algorithm == Information.BYTE:
-            self.__pack_byte("byte_result.seven")
+            self.read_sequence(input_file)
+            self.__pack_byte(f"{output_file}.seven")
 
-            pass
+    def unpack(self, input_file, output_file):
+        if self.algorithm == Information.BYTE:
+            self.read_sequence(f"{input_file}.seven")
+            self.__unpack_byte(output_file)
 
 i = Information(Information.BYTE)
-i.read_sequence("img")
-i.pack()
-# print(i.sequence)
+# i.pack(input_file="img", output_file="byte_result")
+# i.unpack(input_file="byte_result", output_file="unpacked")
+i.pack(input_file="byte_result.seven", output_file="byte_result2")

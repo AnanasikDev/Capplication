@@ -1,11 +1,11 @@
 class RLE:
-    def __init__(self, enumerator):
-        self.enumerator = enumerator
+    def __init__(self, sequence):
+        self.sequence = sequence
 
     def pack_text(self):
         answer = ""
 
-        l = len(self.enumerator)
+        l = len(self.sequence)
         i = 0
 
         def count(l, c):
@@ -18,8 +18,8 @@ class RLE:
             return n
 
         while i < l:
-            c = self.enumerator[i]
-            n = count(self.enumerator[i::], c)
+            c = self.sequence[i]
+            n = count(self.sequence[i::], c)
             i = i + n
             answer += str(n) + c
 
@@ -28,7 +28,7 @@ class RLE:
 
     def unpack_text(self):
         answer = ""
-        length = len(self.enumerator)
+        length = len(self.sequence)
 
         def parse(s):
             i = 0
@@ -43,8 +43,8 @@ class RLE:
 
         i = 0
         while i < length:
-            d, l = parse(self.enumerator[i::])
-            c = parse(self.enumerator[i + l::])[0]
+            d, l = parse(self.sequence[i::])
+            c = parse(self.sequence[i + l::])[0]
             answer += c * d
             i += l + 1
 
@@ -55,7 +55,7 @@ class RLE:
         def split(s):
             return [(s[i:i + 2]) for i in range(0, len(s), 2)]
 
-        self.enumerator = split(self.enumerator)
+        self.sequence = split(self.sequence)
 
     def pack_byte(self):
 
@@ -74,9 +74,9 @@ class RLE:
         byte_sequence = []
 
         i = 0
-        while i < len(self.enumerator):
-            cluster = self.enumerator[i]
-            n = count(self.enumerator[i::], cluster)
+        while i < len(self.sequence):
+            cluster = self.sequence[i]
+            n = count(self.sequence[i::], cluster)
             i += n
             if n // 256 > 1:
                 for j in range(n // 256):
@@ -87,8 +87,22 @@ class RLE:
 
         return byte_sequence
 
-    def unpack_byte(self):
+    def unpack_byte(self, signature):
 
-        self.__split_byte_enumerator()
+        self.sequence = list(map(lambda x: x.upper(), self.sequence))
 
-        pass
+        if self.sequence[0:4] != signature:
+            print(f"Format error: got {self.sequence[0:4]} instead of {signature}.")
+            return False
+
+        file_size = int("".join(self.sequence[7:3:-1]), 16)
+        print(file_size, self.sequence[7:3:-1])
+
+        unpacked = []
+
+        for i in range(8, file_size):
+            if i % 2 == 0:
+                for j in range(int(self.sequence[i], 16)+1):
+                    unpacked.append(self.sequence[i+1])
+
+        return unpacked

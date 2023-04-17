@@ -162,5 +162,3 @@ render_left()
 render_right()
 
 tk.mainloop()
-
-# f.write(struct.pack('<2sihhi', bytes.fromhex("424D"), file_size, 0, 0, 54))
