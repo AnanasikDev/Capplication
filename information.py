@@ -1,29 +1,33 @@
 import struct
 from rle import *
+from signature import *
 
 class Information:
     # little-endian
 
     BYTE = 0
     TEXT = 1
-    signature = "CAFEFADE"
-    signature_bs = ["CA", "FE", "FA", "DE"]
-    signature_size = 4
     def __init__(self, algorithm):
         self.sequence = None
         self.algorithm = algorithm
-
 
     def read_sequence(self, path):
         if self.algorithm == Information.BYTE:
             with open(path, "rb") as file:
                 sequence = []
                 while True:
-                    try:
-                        sequence.append(hex(struct.unpack("<B", file.read(1))[0])[2::].upper().zfill(2))
-                    except:
+                    chunk = file.read(1)
+                    if chunk == b"":
                         break
+                    sequence.append(hex(struct.unpack("<B", chunk)[0])[2::].upper().zfill(2))
         self.sequence = sequence
+
+
+    def define_algorithm(self, file):
+        if isbyte(file):
+            self.algorithm = Information.BYTE
+        else:
+            self.algorithm = Information.TEXT
 
 
     def __pack_byte(self, path):
@@ -31,10 +35,10 @@ class Information:
         packed = RLE(self.sequence).pack_byte()
 
         # size of the packed file: number of bytes of content + signature + 4-byte int for length
-        file_size = len(packed) + Information.signature_size + 4
+        file_size = len(packed) + signature_size + 4
 
         with open(path, "wb") as file:
-            file.write(struct.pack('<4si', bytes.fromhex(Information.signature), file_size))
+            file.write(struct.pack('<4si', bytes.fromhex(signature), file_size))
             for byte in packed:
                 print(byte)
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
@@ -42,11 +46,10 @@ class Information:
 
     def __unpack_byte(self, path):
 
-        unpacked = RLE(self.sequence).unpack_byte(Information.signature_bs)
+        unpacked = RLE(self.sequence).unpack_byte()
 
         with open(path, "wb") as file:
             for byte in unpacked:
-                # print(byte)
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
 
@@ -61,6 +64,7 @@ class Information:
             self.__unpack_byte(output_file)
 
 i = Information(Information.BYTE)
-# i.pack(input_file="img", output_file="byte_result")
+i.define_algorithm(file="img.bmp")
+i.pack(input_file="img.bmp", output_file="byte_result")
 # i.unpack(input_file="byte_result", output_file="unpacked")
-i.pack(input_file="byte_result.seven", output_file="byte_result2")
+# i.pack(input_file="byte_result.seven", output_file="byte_result2")

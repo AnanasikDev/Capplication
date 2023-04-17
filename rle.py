@@ -1,3 +1,5 @@
+from signature import *
+
 class RLE:
     def __init__(self, sequence):
         self.sequence = sequence
@@ -87,12 +89,12 @@ class RLE:
 
         return byte_sequence
 
-    def unpack_byte(self, signature):
+    def unpack_byte(self):
 
         self.sequence = list(map(lambda x: x.upper(), self.sequence))
 
-        if self.sequence[0:4] != signature:
-            print(f"Format error: got {self.sequence[0:4]} instead of {signature}.")
+        if self.sequence[0:4] != signature_bs:
+            print(f"Format error: got {self.sequence[0:4]} instead of {signature_bs}.")
             return False
 
         file_size = int("".join(self.sequence[7:3:-1]), 16)
