@@ -3,8 +3,8 @@ from tkinter import filedialog as fd
 from information import *
 import os
 
-pack_path = ""
-unpack_path = ""
+file2pack = ""
+file2unpack = ""
 
 pack_label_inputname = None
 pack_label_filesize = None
@@ -12,8 +12,8 @@ pack_label_filesize = None
 unpack_label_inputname = None
 unpack_label_filesize = None
 
-pack_input = None
-unpack_input = None
+pack_result_entry = None
+unpack_result_entry = None
 
 result_label = None
 
@@ -23,13 +23,14 @@ def pack():
     if result_label:
         result_label.destroy()
 
-    print("." + pack_input.get() + ".")
-    if pack_input.get() == "":
+    if pack_result_entry.get() == "":
         result_label = tk.Label(text="Error: enter the output file name", fg="red")
-
-    info = Information()
-
-    result_label.pack()
+        result_label.pack()
+    else:
+        info = Information()
+        info.define_algorithm(file2pack)
+        print("file2pack", file2pack, "pack_result_entry_get", pack_result_entry.get())
+        info.pack(input_file=file2pack, output_file=pack_result_entry.get())
 
 
 def unpack():
@@ -37,27 +38,22 @@ def unpack():
     if result_label:
         result_label.destroy()
 
-    print("." + unpack_input.get() + ".")
-    if unpack_input.get() == "":
+    if unpack_result_entry.get() == "":
         result_label = tk.Label(text="Error: enter the output file name", fg="red")
+        result_label.pack()
     else:
-        with open(unpack_path, 'r') as file:
-            text = file.read()
-            with open(unpack_input.get() + ".txt", 'w') as output:
-                unpacked = rle.unpack(text)
-                output.write(unpacked)
-                result_label = tk.Label(text="Success", fg="green")
-    result_label.pack()
+        info = Information()
+        info.define_algorithm(file2unpack)
+        info.unpack(input_file=file2unpack, output_file=unpack_result_entry.get())
 
 
 def callback_pack():
-    global pack_path, pack_label_inputname, pack_label_filesize
-    pack_path = fd.askopenfilename()
-    print(pack_path)
+    global pack_label_inputname, pack_label_filesize, file2pack
+    file2pack = fd.askopenfilename()
     if pack_label_inputname is not None:
         pack_label_inputname.destroy()
 
-    _path2show = pack_path
+    _path2show = file2pack
     l = len(_path2show)
     maxl = 40
     if l > maxl:
@@ -68,20 +64,19 @@ def callback_pack():
 
     if pack_label_filesize:
        pack_label_filesize.destroy()
-    file_stats = os.stat(pack_path)
+    file_stats = os.stat(file2pack)
     pack_label_filesize = tk.Label(window, text="input file size: " + str(file_stats.st_size) + " bytes")
     pack_label_filesize.pack(side=tk.LEFT)
     pack_label_filesize.place(x=10, y=100)
 
 
 def callback_unpack():
-    global unpack_path, unpack_label_inputname, unpack_label_filesize
-    unpack_path = fd.askopenfilename()
-    print(unpack_path)
+    global unpack_label_inputname, unpack_label_filesize, file2unpack
+    file2unpack = fd.askopenfilename()
     if unpack_label_inputname is not None:
         unpack_label_inputname.destroy()
 
-    _path2show = unpack_path
+    _path2show = file2unpack
     l = len(_path2show)
     maxl = 40
     if l > maxl:
@@ -92,7 +87,7 @@ def callback_unpack():
 
     if unpack_label_filesize:
        unpack_label_filesize.destroy()
-    file_stats = os.stat(unpack_path)
+    file_stats = os.stat(file2unpack)
     unpack_label_filesize = tk.Label(window, text="input file size: " + str(file_stats.st_size) + " bytes")
     unpack_label_filesize.pack(side=tk.LEFT)
     unpack_label_filesize.place(x=510, y=100)
@@ -110,7 +105,7 @@ window.resizable(False, False)
 
 def render_left():
 
-    global pack_label_filesize, pack_label_inputname, pack_path, pack_input
+    global pack_label_filesize, pack_label_inputname, path2pack, pack_result_entry
 
     left = tk.Frame(window, width=500, height=400)
     left.pack()
@@ -125,8 +120,8 @@ def render_left():
     output_name_frame.place(x=0, y=300)
 
     tk.Label(output_name_frame, text="output file name: ", width=15).pack(side=tk.LEFT)
-    pack_input = tk.Entry(output_name_frame, width=35)
-    pack_input.pack(side=tk.RIGHT)
+    pack_result_entry = tk.Entry(output_name_frame, width=35)
+    pack_result_entry.pack(side=tk.RIGHT)
 
     btn = tk.Button(window, text='Pack', command=pack)
     btn.pack()
@@ -135,7 +130,7 @@ def render_left():
 
 def render_right():
 
-    global unpack_label_filesize, unpack_label_inputname, unpack_path, unpack_input
+    global unpack_label_filesize, unpack_label_inputname, path2unpack, unpack_result_entry
 
     right = tk.Frame(window, width=500, height=400)
     right.pack()
@@ -150,8 +145,8 @@ def render_right():
     unpack_output_name_frame.place(x=0, y=300)
 
     tk.Label(unpack_output_name_frame, text="output file name: ", width=15).pack(side=tk.LEFT)
-    unpack_input = tk.Entry(unpack_output_name_frame, width=35)
-    unpack_input.pack(side=tk.RIGHT)
+    unpack_result_entry = tk.Entry(unpack_output_name_frame, width=35)
+    unpack_result_entry.pack(side=tk.RIGHT)
 
     btn = tk.Button(window, text='Unpack', command=unpack)
     btn.pack()
