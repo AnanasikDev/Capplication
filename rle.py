@@ -89,15 +89,24 @@ class RLE:
         return byte_sequence
 
     def pack_byte(self):
-        def a(seq, length):
+        def a(seq, length, i):
             s = self.__pack_byte(seq)
             l = len(s)
             if l < length:
-                return a(s, l)
+                return a(s, l, i + 1)
             else:
-                return seq
+                return seq, i
 
-        return a(self.sequence, 10e10)
+        return a(self.sequence, 10e10, 0)
+
+
+    def __unpack_byte(self, content):
+        result = []
+        for i in range(len(content)):
+            if i % 2 == 0:
+                for j in range(int(content[i], 16)+1):
+                    result.append(content[i+1])
+        return result
 
     def unpack_byte(self):
 
@@ -109,11 +118,13 @@ class RLE:
 
         file_size = int("".join(self.sequence[7:3:-1]), 16)
 
-        unpacked = []
+        iterations = int(self.sequence[8], 16)
 
-        for i in range(8, file_size):
-            if i % 2 == 0:
-                for j in range(int(self.sequence[i], 16)+1):
-                    unpacked.append(self.sequence[i+1])
+        print(file_size, iterations)
 
-        return unpacked
+        self.sequence = self.__unpack_byte(self.sequence[9::])
+
+        for i in range(iterations - 1):
+            self.sequence = self.__unpack_byte(self.sequence)
+
+        return self.sequence

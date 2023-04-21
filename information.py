@@ -48,13 +48,15 @@ class Information:
     # Packs BINARY self.sequence in the file named {path}
     def __pack_byte(self, path):
 
-        packed = RLE(self.sequence).pack_byte()
+        packed, iterations = RLE(self.sequence).pack_byte()
 
-        # size of the packed file: number of bytes of content + signature + 4-byte int for length
-        file_size = len(packed) + signature_size + 4
+        # size of the packed file: number of bytes of content + signature + 4-byte int for length + number of iterations to be unpacked
+        file_size = len(packed) + signature_size + 4 + 1
+
+        assert iterations < 256, f"Iterations for packaging exceeds the limitations of 1 byte: {iterations}/{255}"
 
         with open(path, "wb") as file:
-            file.write(struct.pack('<4si', bytes.fromhex(signature), file_size))
+            file.write(struct.pack('<4siB', bytes.fromhex(signature), file_size, iterations))
             for byte in packed:
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
