@@ -1,6 +1,7 @@
 import struct
 from rle import *
 from signature import *
+from path import *
 
 class Information:
     # Information provides interface to work with streams of data
@@ -34,15 +35,30 @@ class Information:
             with open(path, 'r') as file:
                 sequence = file.read()
 
+        else:
+            raise Exception("Information type is undefined")
+
         self.sequence = sequence
 
+    @staticmethod
+    def determine_type(path):
+        with open(path, 'rb') as file:
+            r = file.read()
+            try:
+                data = str(r, "utf-8")
+                return "TEXT"
+            except:
+                return "BYTE"
 
     # Detects type of file (Binary or Text) and defines the packaging algorthm
-    def define_algorithm(self, file):
-        if isbyte(file):
-            self.algorithm = Information.BYTE
-        else:
-            self.algorithm = Information.TEXT
+    def define_algorithm(self, path):
+        with open(path, 'rb') as file:
+            r = file.read()
+            try:
+                data = str(r, "utf-8")
+                self.algorithm = Information.TEXT
+            except:
+                self.algorithm = Information.BYTE
 
 
     # Packs BINARY self.sequence in the file named {path}
