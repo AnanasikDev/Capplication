@@ -53,9 +53,9 @@ class Label:
         if self.instance:
             self.instance.destroy()
 
-    def render(self):
+    def render(self, **kwargs):
         if self.instance:
-            self.instance.pack()
+            self.instance.pack(**kwargs)
 
     def update(self):
         btn = Label(self.name, self.transform, **self.attrs)
@@ -63,31 +63,36 @@ class Label:
         return btn
 
 
-def clamp_path(path):
-    l = len(path)
-    maxl = 30
-    if l > maxl:
-        return "..." + path[l - maxl:l:]
-
 def callback_search_btn():
-    global inpath, btn_execute, mode, lbl_inpath
-    inpath = fd.askopenfilename()
+    global btn_execute, mode, lbl_inpath, lbl_outpath
+    path.inpath = fd.askopenfilename()
 
-    if inpath.split('.')[-1] == 'seven':
+    infile = Path.get_file(path.inpath)
+
+    if Path.get_file_extension(infile) == 'seven':
         # unpacking an archive
-        btn_execute.name = "Unpack"
+        path.outpath = Path.get_file_path(path.inpath) + Path.get_file_name(infile) + "_UNPACKED"
+        outfile = Path.get_file(path.outpath)
+        btn_execute.name = "Unpack to " + Path.get_file_name(outfile)
         btn_execute.attrs["bg"] = "#9999CC"
         mode = UNPACK
 
     else:
         # packing a file
-        btn_execute.name = "Pack"
+        path.outpath = Path.get_file_path(path.inpath) + Path.get_file_name(infile) + ".seven"
+        outfile = Path.get_file(path.outpath)
+        btn_execute.name = "Pack to " + Path.get_file_name(outfile) + ".seven"
         btn_execute.attrs["bg"] = "#99CC99"
         mode = PACK
 
     btn_execute = btn_execute.update()
-    lbl_inpath.name = clamp_path(inpath)
+    lbl_inpath.name = clamp_path(path.inpath)
     lbl_inpath = lbl_inpath.update()
+
+    lbl_outpath.name = clamp_path(path.outpath)
+    lbl_outpath = lbl_outpath.update()
+
+    print("Inpath: " + path.inpath, "Outpath: " + path.outpath)
 
 
 
@@ -101,7 +106,8 @@ def callback_execute_btn():
 
 
 def renderui():
-    global btn_execute, lbl_inpath
-    btn_search = Button("Search file...", callback_search_btn, (0, 0, 500, 40))
-    btn_execute = Button("Pack/Unpack", callback_execute_btn, (0, 350, 500, 50), activebackground="#ECECEC", bg="#CCCCCC")
-    lbl_inpath = Label("File chosen: " + inpath, (0, 100, 500, 50))
+    global btn_execute, lbl_inpath, lbl_outpath
+    btn_search   = Button("Search file...", callback_search_btn, (0, 0, 500, 40))
+    btn_execute  = Button("Pack/Unpack", callback_execute_btn, (0, 350, 500, 50), activebackground="#ECECEC", bg="#CCCCCC")
+    lbl_inpath   = Label ("File chosen: ", (0, 60, 500, 50))
+    lbl_outpath  = Label ("Result file: ", (0, 110, 500, 50))

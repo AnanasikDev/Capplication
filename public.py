@@ -1,5 +1,6 @@
 import tkinter as tk
 from information import *
+from path import *
 
 window = tk.Tk()
 window.title("SEVEN File pack")
@@ -10,40 +11,30 @@ center_y = 1080//2
 window.geometry(f'{500}x{400}+{center_x}+{center_y}')
 window.resizable(False, False)
 
-inpath = ''
-outpath = ''
-
 PACK = 0
 UNPACK = 1
 
 mode = -1
 
 def pack():
-    global result_label, mode
-    if result_label:
-        result_label.destroy()
-
-    if outpath == '':
-        result_label = tk.Label(text="Error: enter the output file name", fg="red")
-        result_label.pack()
-    else:
-        info = Information()
-        info.define_algorithm(inpath)
-        info.pack(input_file=inpath, output_file=outpath)
-
+    global mode
+    info = Information()
+    info.define_algorithm(path.inpath)
+    info.pack(input_file=path.inpath, output_file=path.outpath)
     mode = -1
 
 
 def unpack():
-    global result_label, mode
-    if result_label:
-        result_label.destroy()
-
-    if outpath == '':
-        result_label = tk.Label(text="Error: enter the output file name", fg="red")
-        result_label.pack()
-    else:
-        info = Information()
-        info.define_algorithm(inpath)
-        info.unpack(input_file=inpath, output_file=outpath)
+    global mode
+    info = Information()
+    info.define_algorithm(path.inpath)
+    info.unpack(input_file=path.inpath, output_file=path.outpath)
     mode = -1
+
+
+def clamp_path(path):
+    l = len(path)
+    maxl = 50
+    if l > maxl:
+        return "..." + path[l - maxl:l:]
+    return path
