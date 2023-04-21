@@ -16,6 +16,7 @@ UNPACK = 1
 
 mode = -1
 
+# Starts the process of packing the given file
 def pack():
     global mode
     info = Information()
@@ -24,6 +25,7 @@ def pack():
     mode = -1
 
 
+# Starts the process of unpacking the given file
 def unpack():
     global mode
     info = Information()
@@ -32,6 +34,8 @@ def unpack():
     mode = -1
 
 
+# Clamp the given path {string} and leaves only the end
+# of it if it is too long. The default limit is 50 characters.
 def clamp_path(path):
     l = len(path)
     maxl = 50

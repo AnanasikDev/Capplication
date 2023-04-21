@@ -1,7 +1,6 @@
 import struct
 from rle import *
 from signature import *
-from path import *
 
 class Information:
     # Information provides interface to work with streams of data
@@ -80,9 +79,9 @@ class Information:
     # Unpacks BINARY self.sequence in the file named {path}
     def __unpack_byte(self, path):
 
-        unpacked = RLE(self.sequence).unpack_byte()
+        unpacked, __type = RLE(self.sequence).unpack_byte()
 
-        with open(path, "wb") as file:
+        with open(path + '.' + __type, "wb") as file:
             for byte in unpacked:
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
@@ -101,7 +100,7 @@ class Information:
 
         unpacked = RLE(self.sequence).unpack_text()
 
-        with open(path, "w") as file:
+        with open(path + '.txt', "w") as file:
             file.write(unpacked)
 
 

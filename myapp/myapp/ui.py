@@ -63,6 +63,7 @@ class Label:
         return btn
 
 
+# Callback function of button SEARCH
 def callback_search_btn():
     global btn_execute, mode, lbl_inpath, lbl_outpath
     Path.inpath = fd.askopenfilename()
@@ -71,7 +72,7 @@ def callback_search_btn():
 
     if Path.get_file_extension(infile) == 'seven':
         # unpacking an archive
-        Path.outpath = Path.get_file_path(Path.inpath) + Path.get_file_name(infile) + "_UNPACKED"
+        Path.outpath = Path.get_file_path(Path.inpath) + "unpacked_" + Path.get_file_name(infile)
         outfile = Path.get_file(Path.outpath)
         btn_execute.name = "Unpack to " + Path.get_file_name(outfile)
         btn_execute.attrs["bg"] = "#9999CC"
@@ -96,6 +97,7 @@ def callback_search_btn():
     print("Inpath: " + Path.inpath, "Outpath: " + Path.outpath)
 
 
+# Callback function of button EXECUTE
 def callback_execute_btn():
     if mode == PACK:
         pack()
@@ -105,6 +107,7 @@ def callback_execute_btn():
         print("Error: no file is chosen to be packed or unpacked")
 
 
+# Function to initialize rendering of the whole UI
 def renderui():
     global btn_execute, lbl_inpath, lbl_outpath
     btn_search   = Button("Search file...", callback_search_btn, (0, 0, 500, 40))

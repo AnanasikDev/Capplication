@@ -127,4 +127,6 @@ class RLE:
         for i in range(iterations - 1):
             self.sequence = self.__unpack_byte(self.sequence)
 
-        return self.sequence
+        __type = determine_file_signature(self.sequence)
+
+        return self.sequence, __type
