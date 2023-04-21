@@ -89,11 +89,13 @@ class Information:
 
     # Packs data from {input_file} to {output_file}
     def pack(self, input_file, output_file):
+        if not output_file.endswith(".seven"):
+            output_file += ".seven"
         self.read_sequence(input_file)
         if self.algorithm == Information.BYTE:
-            self.__pack_byte(f"{output_file}.seven")
+            self.__pack_byte(output_file)
         elif self.algorithm == Information.TEXT:
-            self.__pack_text(f"{output_file}.seven")
+            self.__pack_text(output_file)
 
     # Unpacks data from {input_file} to {output_file}
     def unpack(self, input_file, output_file):

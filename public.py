@@ -19,16 +19,16 @@ mode = -1
 def pack():
     global mode
     info = Information()
-    info.define_algorithm(path.inpath)
-    info.pack(input_file=path.inpath, output_file=path.outpath)
+    info.define_algorithm(Path.inpath)
+    info.pack(input_file=Path.inpath, output_file=Path.outpath)
     mode = -1
 
 
 def unpack():
     global mode
     info = Information()
-    info.define_algorithm(path.inpath)
-    info.unpack(input_file=path.inpath, output_file=path.outpath)
+    info.define_algorithm(Path.inpath)
+    info.unpack(input_file=Path.inpath, output_file=Path.outpath)
     mode = -1
 
 

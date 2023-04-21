@@ -65,35 +65,35 @@ class Label:
 
 def callback_search_btn():
     global btn_execute, mode, lbl_inpath, lbl_outpath
-    path.inpath = fd.askopenfilename()
+    Path.inpath = fd.askopenfilename()
 
-    infile = Path.get_file(path.inpath)
+    infile = Path.get_file(Path.inpath)
 
     if Path.get_file_extension(infile) == 'seven':
         # unpacking an archive
-        path.outpath = Path.get_file_path(path.inpath) + Path.get_file_name(infile) + "_UNPACKED"
-        outfile = Path.get_file(path.outpath)
+        Path.outpath = Path.get_file_path(Path.inpath) + Path.get_file_name(infile) + "_UNPACKED"
+        outfile = Path.get_file(Path.outpath)
         btn_execute.name = "Unpack to " + Path.get_file_name(outfile)
         btn_execute.attrs["bg"] = "#9999CC"
         mode = UNPACK
 
     else:
         # packing a file
-        path.outpath = Path.get_file_path(path.inpath) + Path.get_file_name(infile) + ".seven"
-        outfile = Path.get_file(path.outpath)
+        print(Path.get_file_name(infile), Path.get_file_path(Path.inpath) + Path.get_file_name(infile))
+        Path.outpath = Path.get_file_path(Path.inpath) + Path.get_file_name(infile) + ".seven"
+        outfile = Path.get_file(Path.outpath)
         btn_execute.name = "Pack to " + Path.get_file_name(outfile) + ".seven"
         btn_execute.attrs["bg"] = "#99CC99"
         mode = PACK
 
     btn_execute = btn_execute.update()
-    lbl_inpath.name = clamp_path(path.inpath)
+    lbl_inpath.name = clamp_path(Path.inpath)
     lbl_inpath = lbl_inpath.update()
 
-    lbl_outpath.name = clamp_path(path.outpath)
+    lbl_outpath.name = clamp_path(Path.outpath)
     lbl_outpath = lbl_outpath.update()
 
-    print("Inpath: " + path.inpath, "Outpath: " + path.outpath)
-
+    print("Inpath: " + Path.inpath, "Outpath: " + Path.outpath)
 
 
 def callback_execute_btn():

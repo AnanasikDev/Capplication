@@ -1,7 +1,6 @@
 class Path:
-    def __init__(self):
-        self.inpath = ''
-        self.outpath = ''
+    inpath = ''
+    outpath = ''
 
     @staticmethod
     def get_file(path):
@@ -26,4 +25,6 @@ class Path:
         pathparts = path.split('/')
         return '/'.join(pathparts[:len(pathparts) - 1:]) + '/'
 
-path = Path()
+
+p = "/home/jam/IT/Graphs/Capplication/main.py"
+print(Path.get_file_name(Path.get_file(p)))

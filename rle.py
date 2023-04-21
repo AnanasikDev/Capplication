@@ -59,8 +59,7 @@ class RLE:
 
         self.sequence = split(self.sequence)
 
-    def pack_byte(self):
-
+    def __pack_byte(self, sequence):
         def count(lst, cluster):
             n = 0
             for i in range(len(lst)):
@@ -76,9 +75,9 @@ class RLE:
         byte_sequence = []
 
         i = 0
-        while i < len(self.sequence):
-            cluster = self.sequence[i]
-            n = count(self.sequence[i::], cluster)
+        while i < len(sequence):
+            cluster = sequence[i]
+            n = count(sequence[i::], cluster)
             i += n
             if n // 256 > 1:
                 for j in range(n // 256):
@@ -89,6 +88,17 @@ class RLE:
 
         return byte_sequence
 
+    def pack_byte(self):
+        def a(seq, length):
+            s = self.__pack_byte(seq)
+            l = len(s)
+            if l < length:
+                return a(s, l)
+            else:
+                return seq
+
+        return a(self.sequence, 10e10)
+
     def unpack_byte(self):
 
         self.sequence = list(map(lambda x: x.upper(), self.sequence))
@@ -98,7 +108,6 @@ class RLE:
             return False
 
         file_size = int("".join(self.sequence[7:3:-1]), 16)
-        print(file_size, self.sequence[7:3:-1])
 
         unpacked = []
 
