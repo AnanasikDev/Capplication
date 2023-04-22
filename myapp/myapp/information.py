@@ -81,7 +81,10 @@ class Information:
 
         unpacked, __type = RLE(self.sequence).unpack_byte()
 
-        with open(path + '.' + __type, "wb") as file:
+        if __type != '':
+            path += '.' + __type
+
+        with open(path, "wb") as file:
             for byte in unpacked:
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
