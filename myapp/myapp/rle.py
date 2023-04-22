@@ -99,7 +99,6 @@ class RLE:
 
         return a(self.sequence, 10e10, 0)
 
-
     def __unpack_byte(self, content):
         result = []
         for i in range(len(content)):
