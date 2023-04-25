@@ -15,10 +15,8 @@ class NodeTree(object):
         return self.left, self.right
 
 
+# Function to find Huffman Code
 def huffman_code_tree(node, binString=''):
-    '''
-    Function to find Huffman Code
-    '''
     if type(node) is str:
         return {node: binString}
     (l, r) = node.children()
@@ -28,12 +26,10 @@ def huffman_code_tree(node, binString=''):
     return d
 
 
+# Function to make tree
+# :param nodes: Nodes
+# :return: Root of the tree
 def make_tree(nodes):
-    '''
-    Function to make tree
-    :param nodes: Nodes
-    :return: Root of the tree
-    '''
     while len(nodes) > 1:
         (key1, c1) = nodes[-1]
         (key2, c2) = nodes[-2]
@@ -44,19 +40,22 @@ def make_tree(nodes):
     return nodes[0][0]
 
 
+# Based on encoding and solid binary data sequence returns encoded data
 def encode_data(encoding, data):
     encoded_data = ''.join(encoding[char] for char in data)
     return encoded_data
 
 
+# Based on encoding and solid binary data sequence returns encoded data
+# encoding - dictionary VALUE : PATTERN
 # solidata - solid sequence of 0 and 1
 def decode_data(encoding, solidata):
 
     decoded = []
 
-    decoding = {v: k for k, v in encoding.items()}
+    print(encoding)
 
-    print("decoding", decoding)
+    decoding = {v: k for k, v in encoding.items()}
 
     bullet = ''
     for c in solidata:
@@ -68,16 +67,21 @@ def decode_data(encoding, solidata):
     return decoded
 
 
+# Splits solid block of 0 and 1 into bytes with
+# If it is impossible, then the number of bits
+# is extended to the next multiple of 8 by following zeros
 def splitchunks(data):
     l = len(data)
     c = l // 8 * 8
-    print("split", l, c, str(data[c::])[::-1].zfill(8)[::-1])
     a = [data[i:i+8] for i in range(0, c, 8)]
     if l - c > 0:
         a.append(str(data[c::])[::-1].zfill(8)[::-1])
     return a, 8 - l + c
 
 
+# Inverses the sequence of bytes
+# Little Endian -> Big Endian OR Big Endian -> Little Endian
+# Works both with string and lists
 def inverse_bytes(seq):
     if isinstance(seq, str):
         l = len(seq)
@@ -118,8 +122,6 @@ def encode(input_file, output_file):
     node = make_tree(freq)
     encoding = huffman_code_tree(node)
     encoding = dict(sorted(encoding.items(), key=lambda x: len(x[1])))
-    for i in encoding:
-        print(f'{i} : {encoding[i]}')
     encoded = encode_data(encoding, data)
 
     encoded, bits2ignore = splitchunks(encoded)
@@ -139,11 +141,11 @@ def encode(input_file, output_file):
             file.write(struct.pack('<1s', bytes.fromhex(bin2hex(byte))))
 
 
-def decode(input_file, output_file, bits2ignore, dict_size):
-    with open(input_file, "rb") as file:
-        # data = file.read()
-        # data = data[:len(data)-bits2ignore:]
+def decode(input_file, output_file):
 
+    signature, file_size, algorithm, iterations, bits2ignore, dict_size = read_params(input_file)
+
+    with open(input_file, "rb") as file:
         file.seek(27)
         d = file.read()
         encoding = pickle.loads(d)
@@ -180,35 +182,17 @@ def read_params(path):
 
             p = struct.unpack('<B', chunk)[0]
             data.append(int2bin(p))
-        # data = ''.join(data)
-
-        # print(data)
-        # exit()
 
         def read_bytes(n):
             global m
             m += n
-            print(''.join(inverse_bytes(data[(m-n):m:])))
             return ''.join(inverse_bytes(data[(m-n):m:]))
 
-        signature = read_bytes(4)
-        file_size = bin2int(read_bytes(4))
-        algorithm = bin2int(read_bytes(1))
-        iterations = bin2int(read_bytes(1))
+        signature   = read_bytes(4)
+        file_size   = bin2int(read_bytes(4))
+        algorithm   = bin2int(read_bytes(1))
+        iterations  = bin2int(read_bytes(1))
         bits2ignore = bin2int(read_bytes(1))
-        dict_size = bin2int(read_bytes(4))
-
-        print(signature, file_size, algorithm, iterations, bits2ignore, dict_size)
+        dict_size   = bin2int(read_bytes(4))
 
     return signature, file_size, algorithm, iterations, bits2ignore, dict_size
-
-
-if __name__ == '__main__':
-
-    # path = '/home/jam/IT/Graphs/Capplication/myapp/myapp/data/text.txt'
-    path = '/home/jam/IT/Graphs/Capplication/myapp/myapp/data/img2.bmp'
-
-
-    # encode(path, "./output.huffman")
-    signature, file_size, algorithm, iterations, bits2ignore, dict_size = read_params("./output.huffman")
-    decode("./output.huffman", "./decoded", bits2ignore, dict_size)
