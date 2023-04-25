@@ -59,7 +59,6 @@ class Information:
             except:
                 self.algorithm = Information.BYTE
 
-
     # Packs BINARY self.sequence in the file named {path}
     def __pack_byte(self, path):
 
@@ -75,7 +74,6 @@ class Information:
             for byte in packed:
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
-
     # Unpacks BINARY self.sequence in the file named {path}
     def __unpack_byte(self, path):
 
@@ -88,7 +86,6 @@ class Information:
             for byte in unpacked:
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
-
     # Packs TEXT self.sequence in the file named {path}
     def __pack_text(self, path):
 
@@ -97,7 +94,6 @@ class Information:
         with open(path, "w") as file:
             file.write(packed)
 
-
     # Unpacks TEXT self.sequence in the file named {path}
     def __unpack_text(self, path):
 
@@ -105,7 +101,6 @@ class Information:
 
         with open(path + '.txt', "w") as file:
             file.write(unpacked)
-
 
     # Packs data from {input_file} to {output_file}
     def pack(self, input_file, output_file):

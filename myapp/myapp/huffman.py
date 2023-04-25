@@ -61,6 +61,8 @@ def decode_data(encoding, solidata):
         bullet += c
         if bullet in list(decoding.keys()):
             decoded.append(decoding[bullet])
+            if bullet != '1':
+                print(bullet)
             bullet = ''
 
     return decoded
@@ -69,11 +71,11 @@ def decode_data(encoding, solidata):
 def splitchunks(data):
     l = len(data)
     c = l // 8 * 8
-    print(l, c)
+    print("split", l, c, str(data[c::])[::-1].zfill(8)[::-1])
     a = [data[i:i+8] for i in range(0, c, 8)]
     if l - c > 0:
         a.append(str(data[c::])[::-1].zfill(8)[::-1])
-    return a
+    return a, 8 - l + c
 
 
 def int2hex(i):
@@ -111,15 +113,22 @@ if __name__ == '__main__':
         print(f'{i} : {encoding[i]}')
     encoded = encode_data(encoding)
 
-    encoded = splitchunks(encoded)
+    # decoded = decode_data({'a' : '001', 'b': '0001', 'c' : '11001'}, '001000111001')
+    # print(decoded)
 
-    with open("./data/sencoded", "wb") as file:
+    # exit()
+
+    # print(bin2hex('10000000'))
+
+    encoded, bits2ignore = splitchunks(encoded)
+
+    with open("./data/encoded", "wb") as file:
         for byte in encoded:
             if byte == b'':
                 break
             file.write(struct.pack('<1s', bytes.fromhex(bin2hex(byte))))
 
-    with open("./data/sencoded", "rb") as file:
+    with open("./data/encoded", "rb") as file:
         data = []
         while True:
             chunk = file.read(1)
@@ -129,10 +138,11 @@ if __name__ == '__main__':
             p = struct.unpack('<B', chunk)[0]
             data.append(int2bin(p))
         data = ''.join(data)
+        data = data[:len(data)-bits2ignore:]
 
         decoded = decode_data(encoding, data)
 
-        with open("./data/sdecoded", "wb") as file:
+        with open("./data/decoded", "wb") as file:
             for byte in decoded:
                 if byte == b'':
                     break

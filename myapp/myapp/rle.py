@@ -1,6 +1,9 @@
 from signature import *
 
 class RLE:
+
+    # RLE-based archiver class
+
     def __init__(self, sequence):
         self.sequence = sequence
 
