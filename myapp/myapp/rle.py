@@ -119,8 +119,6 @@ class RLE:
 
         iterations = int(self.sequence[8], 16)
 
-        print(file_size, iterations)
-
         self.sequence = self.__unpack_byte(self.sequence[9::])
 
         for i in range(iterations - 1):
