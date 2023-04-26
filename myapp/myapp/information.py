@@ -1,6 +1,6 @@
 from rle import *
 from huffman import *
-from lib.utils import *
+from utils import *
 
 class Information:
 

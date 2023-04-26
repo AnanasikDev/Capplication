@@ -1,7 +1,7 @@
 from collections import Counter
 import pickle
 from signature import *
-from lib.utils import *
+from utils import *
 
 # Binary tree implementation
 class NodeTree(object):
