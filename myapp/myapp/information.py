@@ -91,9 +91,11 @@ class Information:
         if r_length != -1 and r_length < h_length:
             print(f"RLE is more efficient in this case: {r_length} compared to {h_length}")
             self.__pack_byte_rle(output_file, r_packed, r_iterations, r_length)
+            return r_length
         else:
             print(f"Huffman is more efficient in this case: {h_length} compared to {r_length}")
             self.__pack_byte_hfm(output_file, h_encoded, h_encoding, h_bits2ignore)
+            return h_length
 
 
     # Unpacks BINARY self.sequence in the file named {path}
@@ -107,6 +109,9 @@ class Information:
             with open(output_file, "wb") as file:
                 for byte in unpacked:
                     file.write(struct.pack('<1s', bytes.fromhex(byte)))
+
+            return len(unpacked)
+
         else:
             decoded, __type = Huffman.decode(input_file)
             if __type != '':
@@ -118,17 +123,21 @@ class Information:
                         break
                     file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
+            return len(decoded)
+
     # Packs TEXT self.sequence in the file named {path}
     def __pack_text(self, output_file):
         packed = RLE(self.sequence).pack_text()
         with open(output_file, "w") as file:
             file.write(packed)
+        return len(packed)
 
     # Unpacks TEXT self.sequence in the file named {path}
     def __unpack_text(self, output_file):
         unpacked = RLE(self.sequence).unpack_text()
         with open(output_file + '.txt', "w") as file:
             file.write(unpacked)
+        return len(unpacked)
 
     # Packs data from {input_file} to {output_file}
     def pack(self, input_file, output_file):
@@ -136,9 +145,9 @@ class Information:
             output_file += ".seven"
         self.read_sequence(input_file)
         if self.filetype == Information.BYTE:
-            self.__pack_byte(output_file)
+            return self.__pack_byte(output_file)
         elif self.filetype == Information.TEXT:
-            self.__pack_text(output_file)
+            return self.__pack_text(output_file)
 
     # Unpacks data from {input_file} to {output_file}
     def unpack(self, input_file, output_file):
@@ -147,6 +156,6 @@ class Information:
         self.read_sequence(input_file)
         self.define_alorithm_unpack(input_file)
         if self.filetype == Information.BYTE:
-            self.__unpack_byte(input_file, output_file)
+            return self.__unpack_byte(input_file, output_file)
         elif self.filetype == Information.TEXT:
-            self.__unpack_text(output_file)
+            return self.__unpack_text(output_file)
