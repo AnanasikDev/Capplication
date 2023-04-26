@@ -104,6 +104,7 @@ class RLE:
             if s is False: # Time limit exceed
                 return -1, -1, -1
             l = len(s)
+            print("ENCOde", i)
             if l < length:
                 return a(s, l, i + 1)
             else:
@@ -127,11 +128,9 @@ class RLE:
             print(f"Format error: got {self.sequence[0:4]} instead of {signature_bs}.")
             return False
 
-        file_size = int("".join(self.sequence[7:3:-1]), 16)
+        iterations = int(self.sequence[9], 16)
 
-        iterations = int(self.sequence[8], 16)
-
-        self.sequence = self.__unpack_byte(self.sequence[9::])
+        self.sequence = self.__unpack_byte(self.sequence[15::])
 
         for i in range(iterations - 1):
             self.sequence = self.__unpack_byte(self.sequence)

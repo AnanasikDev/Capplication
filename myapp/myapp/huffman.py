@@ -67,7 +67,6 @@ class Huffman:
             bullet += c
             if bullet in list(decoding.keys()):
                 decoded.append(decoding[bullet])
-                print(bullet)
                 bullet = ''
 
         return decoded
@@ -84,18 +83,6 @@ class Huffman:
             a.append(str(data[c::])[::-1].zfill(8)[::-1])
         # print(a)
         return a, 8 - l + c
-
-    # Inverses the sequence of bytes
-    # Little Endian -> Big Endian OR Big Endian -> Little Endian
-    # Works both with string and lists
-    @staticmethod
-    def __inverse_bytes(seq):
-        if isinstance(seq, str):
-            l = len(seq)
-            a = [seq[i:i + 2] for i in range(0, l, 2)]
-            return ''.join(a[::-1])
-        elif isinstance(seq, list):
-            return seq[::-1]
 
 
     # Runs encoding process of {input_file} directly into {output_file}
@@ -146,7 +133,7 @@ class Huffman:
     @staticmethod
     def decode(input_file, output_file):
 
-        signature, file_size, algorithm, iterations, bits2ignore, dict_size = Huffman.__read_params(input_file)
+        signature, file_size, algorithm, iterations, bits2ignore, dict_size = read_params(input_file)
 
         with open(input_file, "rb") as file:
             file.seek(15)
@@ -166,44 +153,9 @@ class Huffman:
             data = ''.join(data)
 
             decoded = Huffman.__decode_data(encoding, data)
-            print(decoded)
 
-            with open(output_file, "wb") as file:
-                for byte in decoded:
-                    if byte == b'':
-                        break
-                    file.write(struct.pack('<1s', bytes.fromhex(byte)))
-
-    # Reads .seven parameters
-    m = 0
-    @staticmethod
-    def __read_params(path):
-        with open(path, "rb") as file:
-            data = []
-            while True:
-                chunk = file.read(1)
-                if chunk == b'':
+        with open(output_file, "wb") as file:
+            for byte in decoded:
+                if byte == b'':
                     break
-
-                p = struct.unpack('<B', chunk)[0]
-                data.append(int2bin(p))
-
-            def read_bytes(n):
-                Huffman.m += n
-                return ''.join(Huffman.__inverse_bytes(data[(Huffman.m - n):Huffman.m:]))
-
-            signature = read_bytes(4)
-            file_size = bin2int(read_bytes(4))
-            algorithm = bin2int(read_bytes(1))
-            iterations = bin2int(read_bytes(1))
-            bits2ignore = bin2int(read_bytes(1))
-            dict_size = bin2int(read_bytes(4))
-
-        return signature, file_size, algorithm, iterations, bits2ignore, dict_size
-
-
-
-if __name__ == '__main__':
-
-    # Huffman.encode("./data/screenshot", "./data/encoded1.seven")
-    Huffman.decode("./data/encoded1.seven", "./data/decoded")
+                file.write(struct.pack('<1s', bytes.fromhex(byte)))
