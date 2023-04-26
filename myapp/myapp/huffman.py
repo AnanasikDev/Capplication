@@ -81,21 +81,11 @@ class Huffman:
         a = [data[i:i + 8] for i in range(0, c, 8)]
         if l - c > 0:
             a.append(str(data[c::])[::-1].zfill(8)[::-1])
-        # print(a)
         return a, 8 - l + c
 
 
     # Runs encoding process of {input_file} directly into {output_file}
     def encode_data(self):
-        # data = []
-        # with open(input_file, 'rb') as file:
-        #     while True:
-        #         chunk = file.read(1)
-        #         if chunk == b'':
-        #             break
-        #         chunk = int2hex(struct.unpack('<B', chunk)[0])
-        #         data.append(chunk)
-
         freq = dict(Counter(self.sequence))
         freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
         node = make_tree(freq)
@@ -131,7 +121,7 @@ class Huffman:
 
     # Runs decoding process of {input_file} directly into {output_file}
     @staticmethod
-    def decode(input_file, output_file):
+    def decode(input_file):
 
         signature, file_size, algorithm, iterations, bits2ignore, dict_size = read_params(input_file)
 
@@ -151,6 +141,7 @@ class Huffman:
                 data.append(int2bin(struct.unpack('<B', chunk)[0]))
 
             data = ''.join(data)
+            data = data[:len(data)-bits2ignore:]
 
             decoded = Huffman.__decode_data(encoding, data)
 

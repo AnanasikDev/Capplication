@@ -108,7 +108,7 @@ class Information:
                 for byte in unpacked:
                     file.write(struct.pack('<1s', bytes.fromhex(byte)))
         else:
-            decoded, __type = Huffman.decode(input_file, output_file)
+            decoded, __type = Huffman.decode(input_file)
             if __type != '':
                 output_file += '.' + __type
 
