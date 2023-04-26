@@ -1,7 +1,27 @@
-signature = "CAFEFADE"
+signature_str = "CAFEFADE"
 signature_bs = ["CA", "FE", "FA", "DE"]
 signature_size = 4
 
+header_size = signature_size + 4 + 1 + 1 + 1 + 4
+
+"""
+---------------------
+        HEADER:
+---------------------
+
+  [ ] 4 bytes : signature
+  [ ] 4 bytes : file size (including header, [huffman dictionary] and content)
+  [ ] 1 byte  : algorithm of encoding & decoding (0 is RLE; 1 is Huffman)
+  [ ] 1 byte  : iterations - the number of iterations are necessary to conduct 
+                in order to decode original file
+  [H] 1 byte  : bits to ignore - number of following bits at the 
+                end of the file that have been appended to constitute a byte
+  [H] 4 bytes : dict_size; the size of huffman-encoding dictionary in bytes
+
+* [ ] - versatile parameter
+* [H] - huffman-only parameter
+* [R] - rle-only parameter
+"""
 
 # Determines file type based on byte signature
 def determine_file_signature(sequence):

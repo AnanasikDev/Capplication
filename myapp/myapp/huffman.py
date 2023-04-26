@@ -1,7 +1,7 @@
 from collections import Counter
 import struct
 import pickle
-import signature
+from signature import *
 from lib.utils import *
 
 # Binary tree implementation
@@ -41,6 +41,11 @@ def make_tree(nodes):
 
 class Huffman:
 
+    def __init__(self, sequence=None):
+        self.sequence = sequence
+        self.__bits2ignore = 0
+        self.__encoded = None
+
     # Based on encoding and solid binary data sequence returns encoded data
     @staticmethod
     def __encode_data(encoding, data):
@@ -62,6 +67,7 @@ class Huffman:
             bullet += c
             if bullet in list(decoding.keys()):
                 decoded.append(decoding[bullet])
+                print(bullet)
                 bullet = ''
 
         return decoded
@@ -76,6 +82,7 @@ class Huffman:
         a = [data[i:i + 8] for i in range(0, c, 8)]
         if l - c > 0:
             a.append(str(data[c::])[::-1].zfill(8)[::-1])
+        # print(a)
         return a, 8 - l + c
 
     # Inverses the sequence of bytes
@@ -92,37 +99,44 @@ class Huffman:
 
 
     # Runs encoding process of {input_file} directly into {output_file}
-    @staticmethod
-    def encode(input_file, output_file):
-        data = []
-        with open(input_file, 'rb') as file:
-            while True:
-                chunk = file.read(1)
-                if chunk == b'':
-                    break
-                chunk = int2hex(struct.unpack('<B', chunk)[0])
-                data.append(chunk)
+    def encode_data(self):
+        # data = []
+        # with open(input_file, 'rb') as file:
+        #     while True:
+        #         chunk = file.read(1)
+        #         if chunk == b'':
+        #             break
+        #         chunk = int2hex(struct.unpack('<B', chunk)[0])
+        #         data.append(chunk)
 
-        freq = dict(Counter(data))
+        freq = dict(Counter(self.sequence))
         freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
         node = make_tree(freq)
         encoding = huffman_code_tree(node)
         encoding = dict(sorted(encoding.items(), key=lambda x: len(x[1])))
-        encoded = Huffman.__encode_data(encoding, data)
+        encoded = Huffman.__encode_data(encoding, self.sequence)
 
         encoded, bits2ignore = Huffman.__splitchunks(encoded)
 
+        encoded_dict = pickle.dumps(encoding)
+        dictionary_size = len(encoded_dict)
+        file_size = header_size + dictionary_size + len(encoded)
+
+        return file_size, encoded, encoding, bits2ignore
+
+    @staticmethod
+    def encode(encoded, output_file, encoding, bits2ignore):
         with open(output_file, "wb") as file:
             encoded_dict = pickle.dumps(encoding)
-            l = len(encoded_dict)
+            dictionary_size = len(encoded_dict)
 
-            file_size = 4 + 4 + 1 + 1 + 1 + 4 + 2 * 3 * 4 + l + len(encoded)
+            file_size = header_size + dictionary_size + len(encoded)
 
             file.write(
-                struct.pack('<4siBBBiiii', bytes.fromhex(signature.signature), file_size, 1, 1, bits2ignore, l, 0, 0,
-                            0))
+                struct.pack('<4siBBBi',
+                            bytes.fromhex(signature_str), file_size, 1, 1, bits2ignore, dictionary_size)
+                      )
             pickle.dump(encoding, file)
-            file.write(struct.pack('<iii', 0, 0, 0))
             for byte in encoded:
                 if byte == b'':
                     break
@@ -135,11 +149,11 @@ class Huffman:
         signature, file_size, algorithm, iterations, bits2ignore, dict_size = Huffman.__read_params(input_file)
 
         with open(input_file, "rb") as file:
-            file.seek(27)
+            file.seek(15)
             d = file.read()
             encoding = pickle.loads(d)
 
-            m = 4 + 4 + 1 + 1 + 1 + 4 + 2 * 3 * 4 + dict_size
+            m = header_size + dict_size
             file.seek(m)
 
             data = []
@@ -152,6 +166,7 @@ class Huffman:
             data = ''.join(data)
 
             decoded = Huffman.__decode_data(encoding, data)
+            print(decoded)
 
             with open(output_file, "wb") as file:
                 for byte in decoded:
@@ -190,4 +205,5 @@ class Huffman:
 
 if __name__ == '__main__':
 
-    Huffman.decode("./data/decoded1", "./data/decoded0")
+    # Huffman.encode("./data/screenshot", "./data/encoded1.seven")
+    Huffman.decode("./data/encoded1.seven", "./data/decoded")

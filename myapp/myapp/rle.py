@@ -1,4 +1,5 @@
 from signature import *
+from time import time
 
 class RLE:
 
@@ -77,6 +78,9 @@ class RLE:
 
         byte_sequence = []
 
+        time_start = time()
+        time_limit = 25 # seconds
+
         i = 0
         while i < len(sequence):
             cluster = sequence[i]
@@ -89,16 +93,21 @@ class RLE:
             byte_sequence.append(dec2hex(n % 256))
             byte_sequence.append(cluster)
 
+            if time() - time_start > time_limit: # Time limit exceed
+                return False
+
         return byte_sequence
 
     def pack_byte(self):
         def a(seq, length, i):
             s = self.__pack_byte(seq)
+            if s is False: # Time limit exceed
+                return -1, -1, -1
             l = len(s)
             if l < length:
                 return a(s, l, i + 1)
             else:
-                return seq, i
+                return seq, i, header_size + len(seq)
 
         return a(self.sequence, 10e10, 0)
 

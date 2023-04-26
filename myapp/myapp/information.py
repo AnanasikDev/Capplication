@@ -1,6 +1,7 @@
 import struct
 from rle import *
 from signature import *
+from huffman import *
 
 class Information:
     # Information provides interface to work with streams of data
@@ -59,47 +60,55 @@ class Information:
             except:
                 self.algorithm = Information.BYTE
 
-    # Packs BINARY self.sequence in the file named {path}
-    def __pack_byte(self, path):
-
-        packed, iterations = RLE(self.sequence).pack_byte()
-
-        # size of the packed file: number of bytes of content + signature + 4-byte int for length + number of iterations to be unpacked
-        file_size = len(packed) + signature_size + 4 + 1
-
-        assert iterations < 256, f"Iterations for packaging exceeds the limitations of 1 byte: {iterations}/{255}"
-
-        with open(path, "wb") as file:
-            file.write(struct.pack('<4siB', bytes.fromhex(signature), file_size, iterations))
+    def __pack_byte_rle(self, output_file, packed, iterations, file_size):
+        with open(output_file, "wb") as file:
+            file.write(struct.pack('<4siBiBB', bytes.fromhex(signature_str), file_size, 0, iterations, 0, 0))
             for byte in packed:
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
+    def __pack_byte_hfm(self, output_file, encoded, encoding, bits2ignore):
+        Huffman.encode(encoded, output_file, encoding, bits2ignore)
+
+
+    def __pack_byte(self, output_file):
+        r_packed, r_iterations, r_length = RLE(self.sequence).pack_byte()
+        h_length, h_encoded, h_encoding, h_bits2ignore = Huffman(self.sequence).encode_data()
+
+        if r_length != -1 and r_length < h_length:
+            print(f"RLE is more efficient in this case: {r_length} compared to {h_length}")
+            self.__pack_byte_rle(output_file, r_packed, r_iterations, r_length)
+        else:
+            print(f"Huffman is more efficient in this case: {h_length} compared to {r_length}")
+            self.__pack_byte_hfm(output_file, h_encoded, h_encoding, h_bits2ignore)
+
+
+
     # Unpacks BINARY self.sequence in the file named {path}
-    def __unpack_byte(self, path):
+    def __unpack_byte(self, output_file):
 
         unpacked, __type = RLE(self.sequence).unpack_byte()
 
         if __type != '':
-            path += '.' + __type
+            output_file += '.' + __type
 
-        with open(path, "wb") as file:
+        with open(output_file, "wb") as file:
             for byte in unpacked:
                 file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
     # Packs TEXT self.sequence in the file named {path}
-    def __pack_text(self, path):
+    def __pack_text(self, output_file):
 
         packed = RLE(self.sequence).pack_text()
 
-        with open(path, "w") as file:
+        with open(output_file, "w") as file:
             file.write(packed)
 
     # Unpacks TEXT self.sequence in the file named {path}
-    def __unpack_text(self, path):
+    def __unpack_text(self, output_file):
 
         unpacked = RLE(self.sequence).unpack_text()
 
-        with open(path + '.txt', "w") as file:
+        with open(output_file + '.txt', "w") as file:
             file.write(unpacked)
 
     # Packs data from {input_file} to {output_file}
