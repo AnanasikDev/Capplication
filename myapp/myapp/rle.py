@@ -8,6 +8,7 @@ class RLE:
     def __init__(self, sequence):
         self.sequence = sequence
 
+    # Packs {self.sequence} and returns encoded data
     def pack_text(self):
         answer = ""
 
@@ -31,7 +32,7 @@ class RLE:
 
         return answer
 
-
+    # Unpacks {self.sequence} and returns decoded data
     def unpack_text(self):
         answer = ""
         length = len(self.sequence)
@@ -56,13 +57,11 @@ class RLE:
 
         return answer
 
-
+    # Splits solid binary data to list of bytes
     def __split_byte_enumerator(self):
-        def split(s):
-            return [(s[i:i + 2]) for i in range(0, len(s), 2)]
+        return [(self.sequence[i:i + 2]) for i in range(0, len(self.sequence), 2)]
 
-        self.sequence = split(self.sequence)
-
+    # Packs BINARY sequence
     def __pack_byte(self, sequence):
         def count(lst, cluster):
             n = 0
@@ -111,6 +110,7 @@ class RLE:
 
         return a(self.sequence, 10e10, 0)
 
+    # Parse RLE-encoded data and returns decoded data
     def __unpack_byte(self, content):
         result = []
         for i in range(len(content)):
@@ -119,6 +119,7 @@ class RLE:
                     result.append(content[i+1])
         return result
 
+    # Unpacks {self.sequence} BINARY and returns decoded data and file type
     def unpack_byte(self):
 
         self.sequence = list(map(lambda x: x.upper(), self.sequence))

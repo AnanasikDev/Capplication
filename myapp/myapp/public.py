@@ -20,7 +20,7 @@ mode = -1
 def pack():
     global mode
     info = Information()
-    info.define_filetype(Path.inpath)
+    info.determine_filetype(Path.inpath)
     size = info.pack(input_file=Path.inpath, output_file=Path.outpath)
     mode = -1
 
@@ -31,7 +31,7 @@ def pack():
 def unpack():
     global mode
     info = Information()
-    info.define_filetype(Path.inpath)
+    info.determine_filetype(Path.inpath)
     size = info.unpack(input_file=Path.inpath, output_file=Path.outpath)
     mode = -1
 

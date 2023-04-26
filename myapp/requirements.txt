@@ -1,6 +1,0 @@
-tkinter
-struct
-os
-pickle
-collections
-time

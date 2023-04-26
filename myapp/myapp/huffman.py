@@ -1,5 +1,4 @@
 from collections import Counter
-import struct
 import pickle
 from signature import *
 from lib.utils import *
@@ -101,6 +100,7 @@ class Huffman:
 
         return file_size, encoded, encoding, bits2ignore
 
+    # Writes given encoded data in {output_file}
     @staticmethod
     def encode(encoded, output_file, encoding, bits2ignore):
         with open(output_file, "wb") as file:
