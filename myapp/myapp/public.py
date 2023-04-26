@@ -3,7 +3,7 @@ from information import *
 from path import *
 
 window = tk.Tk()
-window.title("SEVEN File pack")
+window.title("SEVEN Archiver")
 center_x = 1920//2
 center_y = 1080//2
 

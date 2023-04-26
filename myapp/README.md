@@ -5,14 +5,16 @@ Capplication is an archiver which is capable of compressing both text and binary
 # Extension & Signature
 
 The unique extension and corresponding signature is used for this application: .seven; the signature is CAFE FADE in the hexadecimal code. Its structure is described below:
-4 bytes : signature
-4 bytes : total file size
-1 byte  : algorithm of encoding & decoding (0 is RLE; 1 is Huffman)
-1 byte  : iterations - the number of iterations are necessary to conduct 
-        in order to decode original file
-1 byte  : bits to ignore - number of following bits at the 
-        end of the file that have been appended to constitute a byte (Only huffman)
-4 bytes : dict_size; the size of huffman-encoding dictionary in bytes (Only huffman)
+
+| Size    | Function                                                                  |
+|---------|---------------------------------------------------------------------------|
+| 4 bytes | signature                                                                 |
+| 4 bytes | total file size                                                           |
+| 1 byte  | algorithm of encoding & decoding (0 is RLE; 1 is Huffman)                 |
+| 1 byte  | inumber of iterations necessary to be conducted to decode original file   |
+| 1 byte  | number bits at the end of the file that need to be skipped (Only huffman) |
+| 4 bytes | size of huffman-encoding dictionary in bytes (Only huffman)               |
+| - bytes | content                                                                   |
 
 Decoded file has recoveried extension if the original one was .txt, .bmp, .jpg, .png, .mp3, .mp4, .docx, .exe or .doc
 

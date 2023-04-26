@@ -63,10 +63,12 @@ class Label:
         self.destroy()
         return btn
 
+original_size = 0
+packed_size = 0
 
 # Callback function of button SEARCH
 def callback_search_btn():
-    global btn_execute, mode, lbl_inpath, lbl_outpath, lbl_original_size, lbl_result_size
+    global btn_execute, mode, lbl_inpath, lbl_outpath, lbl_original_size, lbl_result_size, original_size, lbl_eff
     Path.inpath = fd.askopenfilename()
 
     infile = Path.get_file(Path.inpath)
@@ -97,33 +99,53 @@ def callback_search_btn():
     lbl_outpath.name = "to: " + clamp_path(Path.outpath)
     lbl_outpath = lbl_outpath.update()
 
-    size = "Original size: " + str(os.stat(Path.inpath).st_size) + "B" if Path.inpath != 0 else ''
+    if Path.inpath != '':
+        original_size = os.stat(Path.inpath).st_size
+        text_size = "Original size: " + str(original_size) + "B"
+    else:
+        original_size = 0
+        text_size = ''
 
-    lbl_original_size.name = size
+    lbl_eff.name = ''
+    lbl_eff = lbl_eff.update()
+
+    lbl_original_size.name = text_size
     lbl_original_size = lbl_original_size.update()
+
+    lbl_result_size.name = ""
+    lbl_result_size = lbl_result_size.update()
 
 
 # Callback function of button EXECUTE
 def callback_execute_btn():
-    global lbl_result_size
+    global lbl_result_size, lbl_eff, packed_size
     if mode == PACK:
-        size = pack()
-        lbl_result_size.name = "Packed size: " + str(size) + "B"
+        packed_size = pack()
+        lbl_result_size.name = "Packed size: " + str(packed_size) + "B"
         lbl_result_size = lbl_result_size.update()
+
+        if packed_size != 0:
+            lbl_eff.name = "Size reduced by " + str(round((original_size / packed_size - 1) * 100)) + "%"
+        else:
+            lbl_eff.name = ''
+        lbl_eff = lbl_eff.update()
+
     elif mode == UNPACK:
         size = unpack()
         lbl_result_size.name = "Unpacked size: " + str(size) + "B"
         lbl_result_size = lbl_result_size.update()
+
     else:
         print("Error: no file is chosen to be packed or unpacked")
 
 
 # Function to initialize rendering of the whole UI
 def renderui():
-    global btn_execute, lbl_inpath, lbl_outpath, lbl_original_size, lbl_result_size
+    global btn_execute, lbl_inpath, lbl_outpath, lbl_original_size, lbl_result_size, lbl_eff
     btn_search   = Button("Search file...", callback_search_btn, (0, 0, 500, 40), bg="#EEEDFF")
     btn_execute  = Button("Pack/Unpack", callback_execute_btn, (0, 350, 500, 50), activebackground="#ECECEC", bg="#CCCCCC")
     lbl_inpath   = Label ("File chosen: ", (0, 60, 500, 50))
     lbl_outpath  = Label ("Result file: ", (0, 110, 500, 50))
     lbl_original_size = Label("Original size: ", (0, 160, 500, 50))
     lbl_result_size = Label("Packed size: ", (0, 210, 500, 50))
+    lbl_eff = Label('', (0, 260, 500, 50))
