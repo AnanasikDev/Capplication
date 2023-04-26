@@ -48,9 +48,11 @@ def determine_file_signature(sequence):
 
     sn = list(signatures.keys())
 
+    signature_size_limit = 16
+
     n = 0
     for byte in sequence:
-        if n > 16:
+        if n > signature_size_limit:
             return ''
         signature += byte.upper() + ' '
         if signature.strip() in sn:

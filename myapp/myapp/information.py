@@ -60,13 +60,9 @@ class Information:
     def define_alorithm_unpack(self, path):
         signature, file_size, algorithm, iterations, bits2ignore, dict_size = read_params(path)
 
-        print("params", signature, file_size, algorithm, iterations, bits2ignore, dict_size)
-
         if algorithm == Information.HUFFMAN:
-            print("Decoding with huffman")
             self.algorithm = Information.HUFFMAN
         else:
-            print("Decoding with rle")
             self.algorithm = Information.RLE
 
     def define_filetype(self, path):
@@ -112,8 +108,15 @@ class Information:
                 for byte in unpacked:
                     file.write(struct.pack('<1s', bytes.fromhex(byte)))
         else:
-            print("HUFFMAN DECODE")
-            Huffman.decode(input_file, output_file)
+            decoded, __type = Huffman.decode(input_file, output_file)
+            if __type != '':
+                output_file += '.' + __type
+
+            with open(output_file, "wb") as file:
+                for byte in decoded:
+                    if byte == b'':
+                        break
+                    file.write(struct.pack('<1s', bytes.fromhex(byte)))
 
     # Packs TEXT self.sequence in the file named {path}
     def __pack_text(self, output_file):
@@ -147,5 +150,3 @@ class Information:
             self.__unpack_byte(input_file, output_file)
         elif self.filetype == Information.TEXT:
             self.__unpack_text(output_file)
-
-

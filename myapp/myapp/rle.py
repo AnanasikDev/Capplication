@@ -104,7 +104,6 @@ class RLE:
             if s is False: # Time limit exceed
                 return -1, -1, -1
             l = len(s)
-            print("ENCOde", i)
             if l < length:
                 return a(s, l, i + 1)
             else:

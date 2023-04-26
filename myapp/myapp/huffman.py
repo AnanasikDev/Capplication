@@ -154,8 +154,6 @@ class Huffman:
 
             decoded = Huffman.__decode_data(encoding, data)
 
-        with open(output_file, "wb") as file:
-            for byte in decoded:
-                if byte == b'':
-                    break
-                file.write(struct.pack('<1s', bytes.fromhex(byte)))
+        __type = determine_file_signature(decoded)
+
+        return decoded, __type
